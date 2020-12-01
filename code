@@ -1,0 +1,54 @@
+import java.util.*;
+
+class Solution {
+    Integer[] cache;
+    Map<Integer, List<Integer>> map = new HashMap<>();
+    public int solve(String s) {
+        List<int[]> list = new ArrayList();
+        for (int i = 0; i < s.length(); i++) {
+            int l = i - 1;
+            int r = i + 1;
+            while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+                list.add(new int[] {l, r});
+                r++;
+                l--;
+            }
+            l = i - 1;
+            r = i;
+            while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+                list.add(new int[] {l, r});
+                r++;
+                l--;
+            }
+        }
+        for (int i = 0; i < list.size(); i++) {
+            int left = list.get(i)[0];
+            int right = list.get(i)[1];
+            if (map.containsKey(left)) {
+                map.get(left).add(right);
+            } else {
+                List<Integer> temp = new ArrayList();
+                temp.add(right);
+                map.put(left, temp);
+            }
+        }
+        cache = new Integer[s.length()];
+        return recurse(s, 0);
+    }
+    public int recurse(String s, int i) {
+        if (i >= s.length())
+            return 0;
+        if (cache[i] != null)
+            return cache[i];
+        if (map.containsKey(i)) {
+            int ret = recurse(s, i + 1) + 1;
+            for (int x = 0; x < map.get(i).size(); x++) {
+                ret = Math.min(ret, recurse(s, map.get(i).get(x) + 1) + 1);
+            }
+            cache[i] = ret;
+            return ret;
+        }
+        cache[i] = recurse(s, i + 1) + 1;
+        return cache[i];
+    }
+}
